@@ -8,5 +8,4 @@ android {
 
 dependencies {
     implementation(projects.data.marketRepository)
-    implementation(projects.core.uimarket)
 }

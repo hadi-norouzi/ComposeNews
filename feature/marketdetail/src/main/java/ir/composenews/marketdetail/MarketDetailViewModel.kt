@@ -7,12 +7,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.composenews.base.BaseContract
 import ir.composenews.base.BaseViewModel
 import ir.composenews.core_test.dispatcher.DispatcherProvider
+import ir.composenews.domain.model.Market
 import ir.composenews.domain.model.Resource
 import ir.composenews.domain.use_case.GetMarketChartUseCase
 import ir.composenews.domain.use_case.GetMarketDetailUseCase
 import ir.composenews.domain.use_case.ToggleFavoriteMarketListUseCase
-import ir.composenews.uimarket.mapper.toMarket
-import ir.composenews.uimarket.model.MarketModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -82,17 +81,17 @@ class MarketDetailViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun setMarket(market: MarketModel?) {
+    private fun setMarket(market: Market?) {
         mutableState.update {
             it.copy(market = market)
         }
     }
 
-    private fun onFavoriteClick(market: MarketModel?) {
+    private fun onFavoriteClick(market: Market?) {
         market?.let {
             viewModelScope.launch {
                 onIO {
-                    toggleFavoriteMarketListUseCase(market.toMarket())
+                    toggleFavoriteMarketListUseCase(market)
                 }
                 toggleFavoriteState()
             }

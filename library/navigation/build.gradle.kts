@@ -11,7 +11,6 @@ dependencies {
     projects.apply {
         implementation(feature.marketlist)
         implementation(feature.marketdetail)
-        implementation(core.uimarket)
         implementation(domain.market)
     }
     api(libs.navigation.compose)

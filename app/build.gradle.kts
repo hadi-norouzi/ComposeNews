@@ -35,7 +35,6 @@ dependencies {
     projects.core.apply {
         implementation(sync)
         implementation(base)
-        implementation(uimarket)
     }
     libs.apply {
         implementation(compose.activity)

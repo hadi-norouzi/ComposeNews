@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import ir.composenews.base.BaseRoute
 import ir.composenews.base.MainContract
+import ir.composenews.base.StableHolder
 import ir.composenews.base.use
 import ir.composenews.designsystem.component.ShimmerMarketListItem
 import ir.composenews.designsystem.component.pull_refresh_indicator.PullRefreshIndicator
@@ -28,9 +29,9 @@ import ir.composenews.designsystem.component.pull_refresh_indicator.pullRefresh
 import ir.composenews.designsystem.component.pull_refresh_indicator.rememberPullRefreshState
 import ir.composenews.designsystem.preview.ThemePreviews
 import ir.composenews.designsystem.theme.ComposeNewsTheme
+import ir.composenews.domain.model.Market
 import ir.composenews.marketlist.component.MarketListItem
 import ir.composenews.marketlist.preview_provider.MarketListStateProvider
-import ir.composenews.uimarket.model.MarketModel
 import ir.composenews.utils.ContentType
 
 /**
@@ -42,7 +43,7 @@ fun MarketListRoute(
     showFavoriteList: Boolean = false,
     uiState: MainContract.State,
     closeDetailScreen: () -> Unit,
-    onNavigateToDetailScreen: (market: MarketModel) -> Unit,
+    onNavigateToDetailScreen: (market: Market) -> Unit,
     contentType: ContentType,
 ) {
     val (state, event) = use(viewModel = viewModel)
@@ -69,7 +70,7 @@ fun MarketListRoute(
         },
     ) {
         MarketListScreen(
-            marketListState = state,
+            marketListState = StableHolder(state),
             onNavigateToDetailScreen = onNavigateToDetailScreen,
             showFavoriteList = showFavoriteList,
             onFavoriteClick = { market ->
@@ -85,14 +86,17 @@ fun MarketListRoute(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MarketListScreen(
-    marketListState: MarketListContract.State,
+    marketListState: StableHolder<MarketListContract.State>,
     showFavoriteList: Boolean,
-    onNavigateToDetailScreen: (market: MarketModel) -> Unit,
-    onFavoriteClick: (market: MarketModel) -> Unit,
+    onNavigateToDetailScreen: (market: Market) -> Unit,
+    onFavoriteClick: (market: Market) -> Unit,
     onRefresh: () -> Unit,
 ) {
     val refreshState =
-        rememberPullRefreshState(refreshing = marketListState.refreshing, onRefresh = onRefresh)
+        rememberPullRefreshState(
+            refreshing = marketListState.item.refreshing,
+            onRefresh = onRefresh
+        )
 
     Box(
         modifier = Modifier
@@ -100,13 +104,13 @@ private fun MarketListScreen(
             .pullRefresh(refreshState),
     ) {
         AnimatedVisibility(
-            visible = !marketListState.refreshing,
+            visible = !marketListState.item.refreshing,
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(
-                    items = marketListState.marketList,
+                    items = marketListState.item.marketList,
                     key = { it.name },
                 ) { market ->
                     Column(
@@ -132,7 +136,7 @@ private fun MarketListScreen(
             }
         }
         PullRefreshIndicator(
-            marketListState.refreshing,
+            marketListState.item.refreshing,
             refreshState,
             Modifier.align(Alignment.TopCenter),
         )
@@ -148,7 +152,7 @@ private fun MarketListScreenPrev(
     ComposeNewsTheme {
         Surface {
             MarketListScreen(
-                marketListState = marketListState,
+                marketListState = StableHolder(marketListState),
                 showFavoriteList = false,
                 onNavigateToDetailScreen = {},
                 onFavoriteClick = {},

@@ -1,7 +1,9 @@
 package ir.composenews.base
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,4 +71,14 @@ fun <T> Flow<T>.collectInLaunchedEffect(function: suspend (value: T) -> Unit) {
     LaunchedEffect(key1 = flow) {
         flow.collectLatest(function)
     }
+}
+
+@Stable
+class StableHolder<T>(val item: T) {
+    operator fun component1(): T = item
+}
+
+@Immutable
+class ImmutableHolder<T>(val item: T) {
+    operator fun component1(): T = item
 }

@@ -3,12 +3,12 @@ package ir.composenews.marketlist.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import ir.composenews.designsystem.component.MarketItem
-import ir.composenews.uimarket.model.MarketModel
+import ir.composenews.domain.model.Market
 
 @Composable
 fun MarketListItem(
     modifier: Modifier,
-    market: MarketModel,
+    market: Market,
     showFavoriteList: Boolean,
     onItemClick: () -> Unit,
     onFavoriteClick: () -> Unit,

@@ -7,13 +7,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.composenews.base.BaseContract
 import ir.composenews.base.BaseViewModel
 import ir.composenews.core_test.dispatcher.DispatcherProvider
+import ir.composenews.domain.model.Market
 import ir.composenews.domain.use_case.GetFavoriteMarketListUseCase
 import ir.composenews.domain.use_case.GetMarketListUseCase
 import ir.composenews.domain.use_case.SyncMarketListUseCase
 import ir.composenews.domain.use_case.ToggleFavoriteMarketListUseCase
-import ir.composenews.uimarket.mapper.toMarket
-import ir.composenews.uimarket.mapper.toMarketModel
-import ir.composenews.uimarket.model.MarketModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -83,7 +81,7 @@ class MarketListViewModel @Inject constructor(
             .onEach { result ->
                 mutableState.update { prevState ->
                     prevState.copy(
-                        marketList = result.map { it.toMarketModel() }.toPersistentList(),
+                        marketList = result.toPersistentList(),
                         refreshing = false,
                     )
                 }
@@ -104,17 +102,17 @@ class MarketListViewModel @Inject constructor(
         getFavoriteMarketListUseCase().onEach { newList ->
             mutableState.update { prevState ->
                 prevState.copy(
-                    marketList = newList.map { it.toMarketModel() }.toPersistentList(),
+                    marketList = newList.toPersistentList(),
                     refreshing = false,
                 )
             }
         }.launchIn(viewModelScope)
     }
 
-    private fun onFavoriteClick(news: MarketModel) {
+    private fun onFavoriteClick(news: Market) {
         viewModelScope.launch {
             onIO {
-                toggleFavoriteMarketListUseCase(news.toMarket())
+                toggleFavoriteMarketListUseCase(news)
             }
         }
     }
